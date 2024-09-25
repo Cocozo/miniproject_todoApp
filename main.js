@@ -67,7 +67,6 @@ const inputEventHandler = (event) => {
 
 }
 
-
 const listClickHandler = (event) => {
     // 이벤트 델리게이션 -> 상위 에서 이벤트를 받아 아래로 내려줌
     if (event.target.matches(".todo-list > li > div > .delete-btn")) {
@@ -77,6 +76,7 @@ const listClickHandler = (event) => {
     }
 }
 
+// 더블클릭시 인풋텍스트필드가 생성되는 이벤트 처리 
 const doubleClickEventHandler = (event) => {
     const item = event.target.closest('li');
     if(item){
@@ -86,6 +86,9 @@ const doubleClickEventHandler = (event) => {
         item.innerHTML = ''
         item.appendChild(inputText);
         inputText.classList.add("edit-input");
+        inputText.focus()
+
+        // blur, keypress 이벤트 등록 - id를 사용해야하므로 콜백으로 등록
         inputText.addEventListener("keypress", (event) => {
           if (event.key == "Enter") {
             updateTodo(inputText.value, item.id);
