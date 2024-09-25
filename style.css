@@ -30,6 +30,19 @@ body {
     background-color: #dedede;
 }
 
+.edit-input {
+    display: flex;
+    justify-content: left;
+    height: 35px;
+    max-width: 520px;
+    width: 100%;
+    border-width: 0px 0px 0.5px 0px;
+    border-style: dashed;
+    border-color: black;
+    padding: 5px;
+    font-size: 14pt;
+}
+
 .todo-list {
     list-style: none;
     padding: 10px 10px 10px 10px;
@@ -48,6 +61,7 @@ body {
     display: flex;
     justify-content: space-between;
     height: 35px;
+    max-width: 520px;
     align-items: center;
     border-width: 0px 0px 0.5px 0px;
     border-color: black;
@@ -68,7 +82,7 @@ body {
 }
 
 .to-label {
-    margin-left: 5px;
+    font-size: 14pt;
 }
 
 .toggle{
