@@ -61,6 +61,7 @@ const createListItem = ({ context, index }) => `
 const inputEventHandler = (event) => {
     if(event.key == "Enter") {
         addTodo(input.value);
+        input.value = ''
         drawlist();
     }
 
