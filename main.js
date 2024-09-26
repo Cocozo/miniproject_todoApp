@@ -6,8 +6,13 @@ const input = document.querySelector(".todo-input");
 const list = document.querySelector(".todo-list");
 // 간단한 할일 json 형식으로 받기
 
+function Todo(context, position) {
+  this.context = context;
+  this.position = position;
+}
+
+
 let storage = []
-let order = []
 
 let listObserver = new MutationObserver((mutations) => {
     
@@ -19,15 +24,20 @@ const deleteTodo = (index) => {
 }
 
 //리스트 추가
+// 추가하는 데이터 -> Todoobject
 const addTodo = (context) => {
-    storage.push(context);
+    let todoObject = new Todo(context, storage.length)
+    storage.push(todoObject);
 }
 
 //리스트 업데이트
 const updateTodo = (context, index) => {
-    storage[index] = context
+    storage[index].context = context;
 }
 
+const updateTodoPosition = (position, index) => {
+  storage[index].position = position;
+};
 // 임시 저장소 -> model.js 로 이주예정
 
 // 리스트 가 비어있는지 확인 후, 리스트 숨김처리
@@ -45,16 +55,25 @@ const _checkList = () => {
 const drawlist = () => {
     list.innerHTML = "";
     
+    storage.sort((a, b) => {
+        return a.position - b.position;
+    });
+
     storage.forEach((context, index) => {
         list.innerHTML += createListItem({context, index});
-    })
+    });
+
     list.querySelectorAll(".item").forEach(item => {
         item.addEventListener('dragstart', () => {
             setTimeout(() => item.classList.add("dragging"), 0);
         });
 
-        item.addEventListener("dragend", () => {
-          item.classList.remove("dragging");
+        item.addEventListener("dragend", (event) => {
+            const items = [...list.querySelectorAll(".item")]
+            console.log(items.findIndex(value => value.classList.contains('dragging')));
+            updateTodoPosition(position =  items.findIndex(value => value.classList.contains('dragging')), index = event.target.id)
+            // console.log(storage[items.findIndex(value => value.classList.contains('dragging'))].position)
+            item.classList.remove("dragging");
         });
 
     });
@@ -65,7 +84,7 @@ const drawlist = () => {
 const createListItem = ({ context, index }) => `
 <li class="item" id ="${index}" draggable="true">
     <div class="list-item">
-        <label class="to-label">${context}</label>
+        <label class="to-label">${context.context}</label>
         <button class="delete-btn">X</button>
     </div>
 </li>
@@ -78,7 +97,7 @@ const initSortableList = (event) => {
     let siblings = [...list.querySelectorAll(".item:not(.dragging)")];
 
     let nextSibling = siblings.find((sibling) => {
-      return event.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
+      return event.clientY + window.scrollY <= sibling.offsetTop + sibling.offsetHeight / 2;
     });    
     list.insertBefore(target, nextSibling);
 };
@@ -108,7 +127,7 @@ const doubleClickEventHandler = (event) => {
     if(item){
         // console.log(item.id)
         const inputText = document.createElement("input");
-        inputText.value = storage[item.id];
+        inputText.value = storage[item.id].context;
         item.innerHTML = ''
         item.appendChild(inputText);
         inputText.classList.add("edit-input");
