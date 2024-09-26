@@ -1,10 +1,13 @@
 //todolist app 만들기 - 초미니 프로젝트
 
+// 09-25 해야할 일  - 각 기능을 mvc 패턴에 맞게 재설계
+
 const input = document.querySelector(".todo-input");
 const list = document.querySelector(".todo-list");
 // 간단한 할일 json 형식으로 받기
 
 let storage = []
+let order = []
 
 let listObserver = new MutationObserver((mutations) => {
     
@@ -25,6 +28,8 @@ const updateTodo = (context, index) => {
     storage[index] = context
 }
 
+// 임시 저장소 -> model.js 로 이주예정
+
 // 리스트 가 비어있는지 확인 후, 리스트 숨김처리
 const _checkList = () => {
     // console.log(list.children.length);
@@ -43,19 +48,40 @@ const drawlist = () => {
     storage.forEach((context, index) => {
         list.innerHTML += createListItem({context, index});
     })
+    list.querySelectorAll(".item").forEach(item => {
+        item.addEventListener('dragstart', () => {
+            setTimeout(() => item.classList.add("dragging"), 0);
+        });
 
+        item.addEventListener("dragend", () => {
+          item.classList.remove("dragging");
+        });
+
+    });
     _checkList();
 }
 
 // 리스트 아이템
 const createListItem = ({ context, index }) => `
-<li class="" id ="${index}">
+<li class="item" id ="${index}" draggable="true">
     <div class="list-item">
         <label class="to-label">${context}</label>
         <button class="delete-btn">X</button>
     </div>
 </li>
 `;
+
+const initSortableList = (event) => {
+    event.preventDefault();
+    const target = document.querySelector(".dragging");
+
+    let siblings = [...list.querySelectorAll(".item:not(.dragging)")];
+
+    let nextSibling = siblings.find((sibling) => {
+      return event.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
+    });    
+    list.insertBefore(target, nextSibling);
+};
 
 // 엔터키에 따른 이벤트 헨들러
 const inputEventHandler = (event) => {
@@ -109,6 +135,9 @@ const onLoad = () => {
     input.addEventListener("keypress", inputEventHandler);
     list.addEventListener("click", listClickHandler);
     list.addEventListener("dblclick", doubleClickEventHandler);
+    list.addEventListener("dragover", initSortableList);
+    list.addEventListener("dragenter", event => event.preventDefault());
+    
     _checkList();
 }
 
