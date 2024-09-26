@@ -36,7 +36,19 @@ const updateTodo = (context, index) => {
 }
 
 const updateTodoPosition = (position, index) => {
-  storage[index].position = position;
+    
+    if(index > position) {
+        storage.forEach((value) => {
+            if(value.position >= position && value.position < index) value.position += 1
+        });
+    }
+    else if (index < position) {
+        storage.forEach((value) => {
+            if (value.position > index && value.position <= position) value.position -= 1;
+        });
+        console.log("a")
+    }
+    storage[index].position = position;
 };
 // 임시 저장소 -> model.js 로 이주예정
 
@@ -74,6 +86,7 @@ const drawlist = () => {
             updateTodoPosition(position =  items.findIndex(value => value.classList.contains('dragging')), index = event.target.id)
             // console.log(storage[items.findIndex(value => value.classList.contains('dragging'))].position)
             item.classList.remove("dragging");
+            drawlist();
         });
 
     });
